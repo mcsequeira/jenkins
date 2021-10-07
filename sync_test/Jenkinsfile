@@ -9,7 +9,8 @@ pipeline {
     environment {
     	CREDENTIALS_ID ='vfpt-edis'
         BUCKET = 'rawingest'
-        PATTERN = 'ngbi/control_sheet/pprd/*.yml'
+        PATTERN_CONTROL_SHEET = 'ngbi/control_sheet/pprd/*.yml'
+        PATTERN_DAG_CONFIG = 'ngbi/dag_config/*.yml'
         LOCAL_DIR = '/var/jenkins_tmp/'
     }
 
@@ -19,7 +20,12 @@ pipeline {
             	// Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
                 step([$class: 'DownloadStep', 
                 	credentialsId: env.CREDENTIALS_ID,
-                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN}",
+                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_CONTROL_SHEET}",
+                	localDirectory: env.LOCAL_DIR])
+
+                step([$class: 'DownloadStep', 
+                	credentialsId: env.CREDENTIALS_ID,
+                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_DAG_CONFIG}",
                 	localDirectory: env.LOCAL_DIR])
             }
         }
@@ -31,3 +37,4 @@ pipeline {
         }
     }
 }
+
