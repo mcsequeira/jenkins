@@ -9,7 +9,7 @@ pipeline {
     environment {
     	CREDENTIALS_ID ='vfpt-edis'
         BUCKET = 'rawingest'
-        PATTERN = 'ngbi'
+        PATTERN = 'ngbi/*'
         LOCAL_DIR = '/home/mariana/Documents/'
     }
 
