@@ -14,7 +14,7 @@ pipeline {
         LOCAL_DIR = '/var/jenkins_tmp/'
         COMPOSER_GIT = 'composer_repo'
         COMPOSER_GIT_URL = 'github.com/mcsequeira/composer_repo.git'
-        GIT_CREDENTIAL_ID = 'mcsequeira'
+        GIT_CREDENTIAL_ID = '96aa22b0-7941-4816-b309-f1d547d52c1c'
     }
 
     stages {
@@ -52,7 +52,7 @@ pipeline {
 					sh "git remote add $COMPOSER_GIT https://$COMPOSER_GIT_URL"
 
 					// Get git credentials
-					withCredentials([gitUsernamePassword(credentialsId: 'mcsequeira', gitToolName: 'git')]) {
+					withCredentials([gitUsernamePassword(credentialsId: '$GIT_CREDENTIAL_ID', gitToolName: 'git')]) {
 						//Fetch remote (-f: force, -P prune tags)
 						sh "git fetch -f -P -p $COMPOSER_GIT"
 					}
