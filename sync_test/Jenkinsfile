@@ -1,10 +1,33 @@
 pipeline {
     agent any
+
+    options { 
+  		// avoid concurrent builds
+  		disableConcurrentBuilds()
+	}
+
+    environment {
+    	CREDENTIALS_ID ='vfpt-edis'
+        BUCKET = 'rawingest'
+        PATTERN = 'ngbi'
+        LOCAL_DIR = '/home/mariana/Documents/'
+    }
+
     stages {
-        stage('build') {
+        stage('Download from GCS') {
             steps {
-                echo 'Hello world'
+            	// Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
+                step([$class: 'DownloadStep', 
+                	credentialsId: env.CREDENTIALS_ID,
+                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN}",
+                	localDirectory: env.LOCAL_DIR])
             }
+        }
+
+        stage('List downloaded files') {
+        	steps {
+        		sh "ls $LOCAL_DIR"
+        	}
         }
     }
 }
