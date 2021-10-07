@@ -49,7 +49,7 @@ pipeline {
         			sh "git checkout -b init"
 
 					// Get git credentials
-					withCredentials([gitUsernamePassword(credentialsId: '$GIT_CREDENTIAL_ID', gitToolName: 'git')]) {
+					withCredentials([gitUsernamePassword(credentialsId: env.GIT_CREDENTIAL_ID, gitToolName: 'git')]) {
 						//Fetch remote (-f: force, -P prune tags)
 						setupRemote('$COMPOSER_GIT', '$COMPOSER_GIT_URL')
 					}
