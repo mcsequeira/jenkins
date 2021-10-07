@@ -10,7 +10,7 @@ pipeline {
     	CREDENTIALS_ID ='vfpt-edis'
         BUCKET = 'rawingest'
         PATTERN = 'ngbi/control_sheet/pprd/*.yml'
-        LOCAL_DIR = '/home/mariana/Documents/'
+        LOCAL_DIR = '/var/jenkins_tmp/'
     }
 
     stages {
