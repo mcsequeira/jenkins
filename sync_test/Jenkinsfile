@@ -12,17 +12,22 @@ pipeline {
         PATTERN_CONTROL_SHEET = 'ngbi/control_sheet/pprd/*.yml'
         PATTERN_DAG_CONFIG = 'ngbi/dag_config/*.yml'
         LOCAL_DIR = '/var/jenkins_tmp/'
+        COMPOSER_GIT = 'composer_repo'
+        COMPOSER_GIT_URL = 'github.com/mcsequeira/composer_repo.git'
+        GIT_CREDENTIAL_ID = 'mcsequeira'
     }
 
     stages {
         stage('Download from GCS') {
             steps {
             	// Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
+            	// control_sheet files
                 step([$class: 'DownloadStep', 
                 	credentialsId: env.CREDENTIALS_ID,
                 	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_CONTROL_SHEET}",
                 	localDirectory: env.LOCAL_DIR])
 
+                // dag_config file
                 step([$class: 'DownloadStep', 
                 	credentialsId: env.CREDENTIALS_ID,
                 	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_DAG_CONFIG}",
@@ -30,11 +35,29 @@ pipeline {
             }
         }
 
-        stage('List downloaded files') {
+        stage('Print working directory') {
         	steps {
-        		sh "ls $LOCAL_DIR"
+        		sh "pwd"
+        	}
+        }
+
+        stage('Setup git repository') {
+        	steps {
+        		script{
+        			// Store initial state in init branch, if doesn't exist create one (refs/heads/init)
+        			sh "if git show-ref --quiet refs/heads/init; then git branch -D init; else git init; fi"
+        			sh "git checkout -b init"
+
+        			//Create remote
+					sh "git remote add $COMPOSER_GIT https://$COMPOSER_GIT_URL"
+
+					// Get git credentials
+					withCredentials([gitUsernamePassword(credentialsId: 'mcsequeira', gitToolName: 'git')]) {
+						//Fetch remote (-f: force, -P prune tags)
+						sh "git fetch -f -P -p $COMPOSER_GIT"
+					}
+        		}
         	}
         }
     }
 }
-
