@@ -1,0 +1,23 @@
+{
+	"repositoryConfigs":[
+		{
+			"name":"repo1",
+			"urlWithoutProtocol":"github.com/mcsequeira/training-playground-merges-repo1.git",
+			"credentialId":"github_mcsequeira"
+		},
+		{
+			"name":"repo2",
+			"urlWithoutProtocol":"github.com/mcsequeira/training-playground-merges-repo1.git",
+			"credentialId":"github_mcsequeira"
+		}
+	],
+	"mergeConfigs":[
+		{
+			"sourceRepository":"repo1",
+			"targetRepository":"repo2",
+			"oneToOneMapping":"master:master",
+			"oneToManyMapping":"",
+			"manyToManyMapping":""
+		}
+	]
+}
