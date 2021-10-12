@@ -18,24 +18,6 @@ pipeline {
     }
 
     stages {
-    	/*
-        stage('Download from GCS') {
-            steps {
-            	// Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
-            	// control_sheet files
-                step([$class: 'DownloadStep', 
-                	credentialsId: env.CREDENTIALS_ID,
-                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_CONTROL_SHEET}",
-                	localDirectory: env.LOCAL_DIR])
-
-                // dag_config file
-                step([$class: 'DownloadStep', 
-                	credentialsId: env.CREDENTIALS_ID,
-                	bucketUri: "gs://${env.BUCKET}/${env.PATTERN_DAG_CONFIG}",
-                	localDirectory: env.LOCAL_DIR])
-            }
-        }
-        */
 
         stage('Print working directory') {
         	steps {
@@ -55,9 +37,24 @@ pipeline {
 							setupRemote(env.COMPOSER_GIT, env.COMPOSER_GIT_URL, env.GIT_USERNAME, env.GIT_PASSWORD)
 						}
 					}
-                    //sh 'if git remote | grep ^' + env.COMPOSER_GIT + '$; then echo "true"; else echo "false"; fi'
-
         	}
+        }
+
+        stage('Download from GCS') {
+            steps {
+                // Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
+                // control_sheet files
+                step([$class: 'DownloadStep', 
+                    credentialsId: env.CREDENTIALS_ID,
+                    bucketUri: "gs://${env.BUCKET}/${env.PATTERN_CONTROL_SHEET}",
+                    localDirectory: "${WORKSPACE}"])
+
+                // dag_config file
+                step([$class: 'DownloadStep', 
+                    credentialsId: env.CREDENTIALS_ID,
+                    bucketUri: "gs://${env.BUCKET}/${env.PATTERN_DAG_CONFIG}",
+                    localDirectory: "${WORKSPACE}"])
+            }
         }
     }
 }
@@ -67,30 +64,11 @@ pipeline {
 * perform git fetch
 ****************************************/
 def setupRemote(name = '', urlWithoutProtocol = '', username = '', password = '') {
-    /*
-    def existingRepo = sh(returnStdout: true, script: 'if (git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi').trim()
-	//boolean remoteExists = (sh(returnStdout: true, script: 'if (git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi').trim() == name)
-    //https://stackoverflow.com/questions/59220020/why-jenkins-mounts-a-temporary-volume-in-addition-to-the-workspace
-    def remoteExists = (existingRepo.split('\n')[0].trim() == name.trim())
-    println("existingRepo: '" + existingRepo.split('\n')[0].trim() + "'")
-    println("name: '" + name + "'")
-    println(remoteExists == "true")
-    */
-
+    // assess whether the remote already exists; if so set the remote url (to be sure); if not, create the remote
     sh 'if (git remote | grep ^' + name + '$); \
         then git remote set-url ' + name + ' https://' + urlWithoutProtocol + '; \
         else git remote add ' + name + ' https://' + urlWithoutProtocol +'; fi'
 	
-    /*
-    if (remoteExists == "true") {
-		//Set remote url (to be sure)
-		sh "git remote set-url " + name + " https://" + urlWithoutProtocol
-	}
-	else {
-		//Create remote
-		sh "git remote add " + name + " https://" + urlWithoutProtocol
-	}
-    */
 
 	sh "echo 'https://" + java.net.URLEncoder.encode(username, "UTF-8") + ":" + java.net.URLEncoder.encode(password, "UTF-8") + "@"+ urlWithoutProtocol + "' >> '$WORKSPACE/.git/.git-credentials'"
 	sh "git config credential.helper \"store --file='$WORKSPACE/.git/.git-credentials'\""
