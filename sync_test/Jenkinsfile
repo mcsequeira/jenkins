@@ -68,21 +68,18 @@ pipeline {
 ****************************************/
 def setupRemote(name = '', urlWithoutProtocol = '', username = '', password = '') {
 	boolean remoteExists = (sh(returnStdout: true, script: 'if (git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi').trim() == name)
-    def print_output = sh(returnStdout: true, script: 'if (git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi').trim()
-    println("print_output: " + print_output)
     //https://stackoverflow.com/questions/59220020/why-jenkins-mounts-a-temporary-volume-in-addition-to-the-workspace
-    println(remoteExists)
 
-    sh 'if (git remote | grep ^' + name + '$); then git remote set-url ' + name + ' https://' + urlWithoutProtocol + '; else git remote add ' + name + ' https://' + urlWithoutProtocol +'; fi'
+    //sh 'if (git remote | grep ^' + name + '$); then git remote set-url ' + name + ' https://' + urlWithoutProtocol + '; else git remote add ' + name + ' https://' + urlWithoutProtocol +'; fi'
 	
-    /*if (remoteExists) {
+    if (remoteExists) {
 		//Set remote url (to be sure)
 		sh "git remote set-url " + name + " https://" + urlWithoutProtocol
 	}
 	else {
 		//Create remote
 		sh "git remote add " + name + " https://" + urlWithoutProtocol
-	} */
+	}
 
 	sh "echo 'https://" + java.net.URLEncoder.encode(username, "UTF-8") + ":" + java.net.URLEncoder.encode(password, "UTF-8") + "@"+ urlWithoutProtocol + "' >> '$WORKSPACE/.git/.git-credentials'"
 	sh "git config credential.helper \"store --file='$WORKSPACE/.git/.git-credentials'\""
