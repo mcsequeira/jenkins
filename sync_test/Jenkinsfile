@@ -66,7 +66,7 @@ pipeline {
                 //sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
 
                 //Checkout $sourceBranch (it should always exist) into "local-legacy"
-                sh "git checkout -b " + env.COMPOSER_GIT + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
+                sh "git checkout -b local-legacy " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
 
                 sh "git status"
 
@@ -74,6 +74,9 @@ pipeline {
                 sh "git add *"
 
                 sh "git status"
+
+                sh 'git config --global user.email "you@example.com"'
+                sh 'git config --global user.name "Your Name"'
 
                 // Commit files
                 sh 'git commit -am "to do: insert something"'
