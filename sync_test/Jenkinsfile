@@ -71,7 +71,7 @@ def setupRemote(name = '', urlWithoutProtocol = '', username = '', password = ''
     //https://stackoverflow.com/questions/59220020/why-jenkins-mounts-a-temporary-volume-in-addition-to-the-workspace
     println(remoteExists)
 
-    sh 'if (git remote | grep ^' + name + '$); then git remote set-url' + name + ' https://' + urlWithoutProtocol + '; else echo "false"; fi'
+    sh 'if (git remote | grep ^' + name + '$); then git remote set-url ' + name + ' https://' + urlWithoutProtocol + '; else echo "false"; fi'
 	
     /*if (remoteExists) {
 		//Set remote url (to be sure)
