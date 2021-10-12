@@ -43,17 +43,22 @@ pipeline {
 
         stage('Setup git repository') {
         	steps {
-        		script{
-        			// Store initial state in init branch, if doesn't exist create one (refs/heads/init)
-        			sh "if git show-ref --quiet refs/heads/init; then git branch -D init; fi"
-        			sh "git checkout -b init"
+        		script {
+      				// Store initial state in init branch, if doesn't exist create one (refs/heads/init)
+      				sh "if git show-ref --quiet refs/heads/init; then git branch -D init; fi"
+      				sh "git checkout -b init"
+
+					// TODO use readJSON to read CONFIGS to a local variable
+					def buildConfigs = readJSON text: "$CONFIGS"
 
 					// Get git credentials
-					withCredentials([gitUsernamePassword(credentialsId: env.GIT_CREDENTIAL_ID, gitToolName: 'git')]) {
-						//Fetch remote (-f: force, -P prune tags)
-						setupRemote('$COMPOSER_GIT', '$COMPOSER_GIT_URL')
+					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: repoConfig.credentialId, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]){
+							setupRemote('$COMPOSER_GIT', '$COMPOSER_GIT_URL', env.GIT_USERNAME, env.GIT_PASSWORD)
+						}
+						
 					}
-        		}
+					// use withCredentials to get password and user from jenkins
+					}
         	}
         }
     }
@@ -63,10 +68,8 @@ pipeline {
 * Add repo remote to workspace and 
 * perform git fetch
 ****************************************/
-def setupRemote(name = '', urlWithoutProtocol = '') {
-//, username = '', password = '') {
-	sh 'if $(git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi'
-	boolean remoteExists = (sh(returnStdout: true, script: 'if $(git remote | grep ^' + name + '$); then echo "true"; else echo "false"; fi').trim() == "true")
+def setupRemote(name = '', urlWithoutProtocol = '', username = '', password = '') {
+	boolean remoteExists = (sh(returnStdout: true, script: 'if [[ $(git remote | grep ^' + name + '$) ]]; then echo "true"; else echo "false"; fi').trim() == "true")
 	
 	if (remoteExists) {
 		//Set remote url (to be sure)
@@ -77,8 +80,8 @@ def setupRemote(name = '', urlWithoutProtocol = '') {
 		sh "git remote add " + name + " https://" + urlWithoutProtocol
 	}
 
-	//sh "echo 'https://" + java.net.URLEncoder.encode(username, "UTF-8") + ":" + java.net.URLEncoder.encode(password, "UTF-8") + "@"+ urlWithoutProtocol + "' >> '$WORKSPACE/.git/.git-credentials'"
-	//sh "git config credential.helper \"store --file='$WORKSPACE/.git/.git-credentials'\""
+	sh "echo 'https://" + java.net.URLEncoder.encode(username, "UTF-8") + ":" + java.net.URLEncoder.encode(password, "UTF-8") + "@"+ urlWithoutProtocol + "' >> '$WORKSPACE/.git/.git-credentials'"
+	sh "git config credential.helper \"store --file='$WORKSPACE/.git/.git-credentials'\""
 
 	// remove all local tags & fetch remote tags
 	sh "git tag -l | xargs git tag -d && git fetch -t"
