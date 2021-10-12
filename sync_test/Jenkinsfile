@@ -11,9 +11,9 @@ pipeline {
         BUCKET = 'rawingest'
         PATTERN_CONTROL_SHEET = 'ngbi/control_sheet/pprd/*.yml'
         PATTERN_DAG_CONFIG = 'ngbi/dag_config/*.yml'
-        LOCAL_DIR = '/var/jenkins_tmp/'
         COMPOSER_GIT = 'composer_repo'
         COMPOSER_GIT_URL = 'github.com/mcsequeira/composer_repo.git'
+        COMPOSER_GIT_BRANCH = 'main'
         GIT_CREDENTIAL_ID = '96aa22b0-7941-4816-b309-f1d547d52c1c'
     }
 
@@ -42,7 +42,7 @@ pipeline {
 
         stage('Download from GCS') {
             steps {
-                // Download from GCS bucket object named PATTERN to directory LOCAL_DIR.
+                // Download from GCS bucket object named PATTERN to the workspace.
                 // control_sheet files
                 step([$class: 'DownloadStep', 
                     credentialsId: env.CREDENTIALS_ID,
@@ -54,6 +54,40 @@ pipeline {
                     credentialsId: env.CREDENTIALS_ID,
                     bucketUri: "gs://${env.BUCKET}/${env.PATTERN_DAG_CONFIG}",
                     localDirectory: "${WORKSPACE}"])
+            }
+        }
+
+        stage('Commit to Git'){
+            steps {
+                //Switch to init branch to enable reset of "local-legacy" branch
+                sh "git clean -d -fx . && git checkout -f init"
+
+                //Remove "local-legacy" branch if it exists
+                sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
+
+                //Checkout $sourceBranch (it should always exist) into "local-legacy"
+                sh "git checkout -b local-legacy " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
+
+                sh "git status"
+
+                // Add new files to track
+                sh "git add *"
+
+                sh "git status"
+
+                // Commit files
+                sh 'git commit -am "to do: insert something"'
+
+                sh "git status"
+
+                // Merge files
+                sh "git merge " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
+
+                sh "git status"
+
+                // Push
+                sh "git push local-legacy HEAD:" + env.COMPOSER_GIT_BRANCH
+
             }
         }
     }
