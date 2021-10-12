@@ -51,7 +51,7 @@ pipeline {
       				sh "git checkout -b init"
 
 					// Get git credentials
-					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: $GIT_CREDENTIAL_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]){
+					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: env.GIT_CREDENTIAL_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]){
 							setupRemote('$COMPOSER_GIT', '$COMPOSER_GIT_URL', env.GIT_USERNAME, env.GIT_PASSWORD)
 						}
 					}
