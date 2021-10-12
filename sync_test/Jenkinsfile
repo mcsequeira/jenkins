@@ -55,9 +55,6 @@ pipeline {
 					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: repoConfig.credentialId, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]){
 							setupRemote('$COMPOSER_GIT', '$COMPOSER_GIT_URL', env.GIT_USERNAME, env.GIT_PASSWORD)
 						}
-						
-					}
-					// use withCredentials to get password and user from jenkins
 					}
         	}
         }
