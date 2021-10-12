@@ -89,7 +89,7 @@ pipeline {
                 sh "git status"
 
                 // Push
-                sh "git push local-legacy " + env.COMPOSER_GIT +"/" + env.COMPOSER_GIT_BRANCH
+                sh "git push origin " + env.COMPOSER_GIT +"/" + env.COMPOSER_GIT_BRANCH
 
             }
         }
