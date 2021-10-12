@@ -55,7 +55,7 @@ pipeline {
 							setupRemote(env.COMPOSER_GIT, env.COMPOSER_GIT_URL, env.GIT_USERNAME, env.GIT_PASSWORD)
 						}
 					}
-                    sh 'if git remote | grep ^'env.COMPOSER_GIT'$; then echo "true"; else echo "false"; fi'
+                    sh 'if git remote | grep ^' + env.COMPOSER_GIT + '$; then echo "true"; else echo "false"; fi'
 
         	}
         }
