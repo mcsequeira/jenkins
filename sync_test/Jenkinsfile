@@ -60,13 +60,13 @@ pipeline {
         stage('Commit to Git'){
             steps {
                 //Switch to init branch to enable reset of "local-legacy" branch
-                sh "git clean -d -fx . && git checkout -f init"
+                //sh "git clean -d -fx . && git checkout -f init"
 
                 //Remove "local-legacy" branch if it exists
-                sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
+                //sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
 
                 //Checkout $sourceBranch (it should always exist) into "local-legacy"
-                sh "git checkout -b local-legacy " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
+                sh "git checkout -b " + env.COMPOSER_GIT + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
 
                 sh "git status"
 
