@@ -57,7 +57,7 @@ pipeline {
             }
         }
 
-        stage('Commit to Git'){
+        /*stage('Commit to Git'){
             steps {
                 //Switch to init branch to enable reset of "local-legacy" branch
                 //sh "git clean -d -fx . && git checkout -f init"
@@ -92,7 +92,7 @@ pipeline {
                 sh "git push"
 
             }
-        }
+        } */
     }
 }
 
