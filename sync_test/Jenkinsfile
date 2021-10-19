@@ -57,16 +57,23 @@ pipeline {
             }
         }
 
-        /*stage('Commit to Git'){
+        stage('Commit to Git'){
             steps {
                 //Switch to init branch to enable reset of "local-legacy" branch
                 //sh "git clean -d -fx . && git checkout -f init"
 
                 //Remove "local-legacy" branch if it exists
-                //sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
+                sh "if git show-ref --quiet refs/heads/local-legacy; then git branch -D local-legacy; fi"
 
                 //Checkout $sourceBranch (it should always exist) into "local-legacy"
                 sh "git checkout -b local-legacy " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
+
+                // worked: git checkout -b local composer_repo/main
+                // worked: git add *
+                // git config --global user.email "you@example.com"
+                // git config --global user.name "Your Name"
+                // worked: git commit -am "to do: insert something"
+               // git push composer_repo HEAD:main
 
                 sh "git status"
 
@@ -84,15 +91,10 @@ pipeline {
                 sh "git status"
 
                 // Merge files
-                sh "git merge " + env.COMPOSER_GIT + "/" + env.COMPOSER_GIT_BRANCH
-
-                sh "git status"
-
-                // Push
-                sh "git push"
+                sh "git push " + env.COMPOSER_GIT + " HEAD:" + env.COMPOSER_GIT_BRANCH
 
             }
-        } */
+        }
     }
 }
 
